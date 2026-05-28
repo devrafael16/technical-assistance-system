@@ -22,4 +22,13 @@ class OS:
         self.observacoes = input('Observações: ')
         print()
 
-
+    def mostrar_os(self):
+        print(f'\nNumero da OS: {self.numero_os}')
+        print(f'Cliente: {self.cliente}')
+        print(f'Tipo do aparelho: {self.aparelho}')
+        print(f'Marca/modelo: {self.marca_modelo}')
+        print(f'Data de entrada: {self.data_entrada}')
+        print(f'Defeito: {self.defeito}')
+        print(f'Observações: {self.observacoes}')
+        print(f'Status: {self.status}')
+        print('-' * 30)
