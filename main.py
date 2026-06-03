@@ -19,6 +19,7 @@ def main():
         print('3 - Cadastrar Ordem de Serviço')
         print('4 - Listar Ordem de Serviço')
         print('5 - Buscar Ordem de Serviço')
+        print('6 - Editar Ordem de Serviço')
         print('0 - Sair')
 
         opcao = input('\nDigite a opção desejada: ')
@@ -59,6 +60,8 @@ def main():
                     for ordem_servico in ordens_servico:
                         print(f'{ordem_servico.numero_os} | {ordem_servico.cliente} | {ordem_servico.status}')
                     os_escolhida = input('Digite o numero da OS que deseja vizualizar: ')
+                    if os_escolha.isdigit():
+                        os_escolha = f'OS{int(numero):03d}'
                     for ordem_servico in ordens_servico:
                         if os_escolhida == ordem_servico.numero_os:
                             print(f'\n{ordem_servico.numero_os:^30}')
@@ -77,24 +80,33 @@ def main():
                 print('1 - Buscar por cliente')
                 print('2 - Buscar por número da OS')
                 busca = input()
-                if busca.isdigit:
+                if busca.isdigit():
                     busca = int(busca)
                     if busca == 1:
                         nome_os = input('Digite o nome: ')
-                        if nome_os.lower() in ordem_servico.cliente.lower():
-                            ordem_servico.mostrar_os()
-                            break
-                        else:
+                        encontrou = False
+                        for ordem_servico in ordens_servico:
+                            if nome_os.lower() in ordem_servico.cliente.lower():
+                                ordem_servico.mostrar_os()
+                                encontrou = True
+                                
+                        if not encontrou:
                             print('OS não encontrada.')
-                            break
+                                
                     elif busca == 2:
                         numero = input('Digite o número: ')
-                        if numero in ordem_servico.numero_os:
-                            ordem_servico.mostrar_os
-                            break
-                        else:
+                        if numero.isdigit():
+                            numero = f'OS{int(numero):03d}'
+                        encontrou = False
+                        for ordem_servico in ordens_servico:
+                            if numero == ordem_servico.numero_os:
+                                ordem_servico.mostrar_os()
+                                encontrou = True
+                                
+                        if not encontrou:
                             print('OS não encontrada.')
-                            break
+                            
+
                     else:
                         print('[red]Opção inválida![/] Digite uma opção válida.')
                         continue
@@ -103,6 +115,45 @@ def main():
                 else:
                     print('[red]Opção inválida![/] Digite uma das opções a cima.')
                     continue
+
+            elif opcao == 6:
+                print(f'{" EDITAR ORDEM DE SERVIÇO ":=^30}')
+                numero = input('\n Digite o número da OS que deseja editar: ')
+                if numero.isdigit():
+                    numero = f'OS{int(numero):03d}'
+                    for ordem_servico in ordens_servico:
+                        encontrou = False
+                        if numero == ordem_servico.numero_os:
+                            ordem_servico.mostrar_os()
+                            editar_opcoes = {
+                                '1' : 'cliente',
+                                '2' : 'aparelho',
+                                '3' : 'marca_modelo',
+                                '4' : 'senha_aparelho',
+                                '5' : 'defeito',
+                                '6' : 'status',
+                                '7' : 'valor',
+                                '8' : 'observacoes'
+                            }
+                            print('Qual dado gostaria de alterar: ')
+                            print()
+                            for c,v in editar_opcoes.items():
+                                print(f'{c} - {v}')
+                            opcao = input('')
+                            
+                            if opcao in editar_opcoes:
+                                atributo = editar_opcoes[opcao]
+                                novo_dado = input(f'Novo {atributo}')
+                                if atributo == 'valor':
+                                    novo_dado = float(novo_dado)
+                                ordem_servico.editar_os(atributo, novo_dado)
+                                print('Status atualizado com sucesso!')
+                                encontrou = True
+                            if not encontrou:
+                                print('OS não encontrada!')
+
+
+
 
             elif opcao == 0:
                 print('Saindo do sistema...')

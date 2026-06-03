@@ -32,3 +32,7 @@ class OS:
         print(f'Observações: {self.observacoes}')
         print(f'Status: {self.status}')
         print('-' * 30)
+
+    def editar_os(self, atributo, novo_dado):
+        setattr(self, atributo, novo_dado)
+        
