@@ -3,8 +3,9 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from ordem_servico import OS
+from database import salvar_cliente, listar_clientes
 
-clientes = []
+
 ordens_servico = []
 
 def main():
@@ -30,18 +31,24 @@ def main():
             if opcao  == 1:
                 cliente = Cliente()
                 cliente.cadastro()
-                clientes.append(cliente)
+                salvar_cliente(
+                    cliente.nome,
+                    cliente.cpf,
+                    cliente.telefone,
+                    cliente.endereco
+                )
                 print('[green]Cliente cadastrado com sucesso![/]')
 
             elif opcao == 2:
-                if not clientes:
+                clientes_banco = listar_clientes()
+                if not clientes_banco:
                     print('Nenhum cliente cadastrado.')
                 else:
-                    for cliente in clientes:
-                        print(f'\n{"CLIENTES CADASTRADOS":=^30}')
-                        print(f'\n{"Nome:":<12} {cliente.nome}')
-                        print(f'{"CPF:":<12} {cliente.cpf}')
-                        print(f'{"Telefone:":<12} {cliente.telefone}')
+                    print(f'\n{"CLIENTES CADASTRADOS":=^30}')
+                    for cliente in clientes_banco:
+                        print(f'\n{"Nome:":<12} {cliente[1]}')
+                        print(f'{"CPF:":<12} {cliente[2]}')
+                        print(f'{"Telefone:":<12} {cliente[3]}')
                         print('-' * 30)
 
             elif opcao == 3:
