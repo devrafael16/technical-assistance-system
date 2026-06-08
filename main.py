@@ -3,7 +3,7 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from ordem_servico import OS
-from database import salvar_cliente, listar_clientes
+from database import salvar_cliente, listar_clientes, salvar_os, listar_os
 
 
 ordens_servico = []
@@ -56,30 +56,42 @@ def main():
                 ordem_servico = OS(numero_os)
                 ordem_servico.abrir_os()
                 ordens_servico.append(ordem_servico)
+                salvar_os(
+                    ordem_servico.numero_os,
+                    ordem_servico.cliente,
+                    ordem_servico.aparelho,
+                    ordem_servico.marca_modelo,
+                    ordem_servico.senha_aparelho,
+                    ordem_servico.defeito,
+                    ordem_servico.status,
+                    ordem_servico.valor,
+                    ordem_servico.observacoes,
+                    ordem_servico.data_entrada
+                )
                 print('[green]Ordem de serviço cadastrada com sucesso![/]')
 
             elif opcao == 4:
-                if not ordens_servico:
+                os_banco = listar_os()
+                if not os_banco:
                     print('Nenhuma ordem de serviço cadastrada.')
                 else:
                     print(f'{"ORDENS DE SERVIÇOS":=^30}')
 
-                    for ordem_servico in ordens_servico:
-                        print(f'{ordem_servico.numero_os} | {ordem_servico.cliente} | {ordem_servico.status}')
+                    for i, os in enumerate(os_banco, start=1):
+                        print(f'{i} | {os[1]} | {os[2]}')
                     os_escolhida = input('Digite o numero da OS que deseja vizualizar: ')
-                    if os_escolha.isdigit():
-                        os_escolha = f'OS{int(numero):03d}'
-                    for ordem_servico in ordens_servico:
-                        if os_escolhida == ordem_servico.numero_os:
-                            print(f'\n{ordem_servico.numero_os:^30}')
-                            print(f'\nNumero da OS: {ordem_servico.numero_os}')
-                            print(f'Cliente: {ordem_servico.cliente}')
-                            print(f'Tipo do aparelho: {ordem_servico.aparelho}')
-                            print(f'Marca/modelo: {ordem_servico.marca_modelo}')
-                            print(f'Data de entrada: {ordem_servico.data_entrada}')
-                            print(f'Defeito: {ordem_servico.defeito}')
-                            print(f'Observações: {ordem_servico.observacoes}')
-                            print(f'Status: {ordem_servico.status}')
+                    if os_escolhida.isdigit():
+                        os_escolhida = f'OS{int(os_escolhida):03d}'
+                    for ordem in os_banco:
+                        if os_escolhida == ordem[1]:
+                            print(f'\nNumero da OS: {ordem[1]}')
+                            print(f'Cliente: {ordem[2]}')
+                            print(f'Tipo do aparelho: {ordem[3]}')
+                            print(f'Marca/modelo: {ordem[4]}')
+                            print(f'Data de entrada: {ordem[10]}')
+                            print(f'Defeito: {ordem[6]}')
+                            print(f'Observações: {ordem[9]}')
+                            print(f'Status: {ordem[7]}')
                             print('-' * 30)
                             break
 
@@ -128,9 +140,10 @@ def main():
                 numero = input('\n Digite o número da OS que deseja editar: ')
                 if numero.isdigit():
                     numero = f'OS{int(numero):03d}'
+                    encontrou = False
                     for ordem_servico in ordens_servico:
-                        encontrou = False
                         if numero == ordem_servico.numero_os:
+                            encontrou = True
                             ordem_servico.mostrar_os()
                             editar_opcoes = {
                                 '1' : 'cliente',
@@ -155,9 +168,8 @@ def main():
                                     novo_dado = float(novo_dado)
                                 ordem_servico.editar_os(atributo, novo_dado)
                                 print('Status atualizado com sucesso!')
-                                encontrou = True
-                            if not encontrou:
-                                print('OS não encontrada!')
+                    if not encontrou:
+                        print('OS não encontrada!')
 
 
 

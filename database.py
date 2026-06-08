@@ -84,12 +84,26 @@ def salvar_os(
 
     cursor.execute("""
     INSERT INTO ordens_servico
-    (numero_os, cliente, aparelho, marca_modelo, senha_aparelho, defeito, status, valor, observacoes, data_entrega)
+    (numero_os, cliente, aparelho, marca_modelo, senha_aparelho, defeito, status, valor, observacoes, data_entrada)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (numero_os, cliente, aparelho, marca_modelo, senha_aparelho, defeito, status, valor, observacoes, data_entrada))
 
     conexao.commit()
     conexao.close()
+
+
+def listar_os():
+    
+    conexao: sqlite3.Connection = sqlite3.connect('assistencia.db')
+    cursor: sqlite3.Cursor = conexao.cursor()
+
+    cursor.execute("""
+    SELECT * FROM ordens_servico
+    """)
+
+    ordens = cursor.fetchall()
+    conexao.close()
+    return ordens
 
 
 if __name__ == '__main__':

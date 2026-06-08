@@ -17,7 +17,7 @@ class OS:
         self.cliente = input('Nome do cliente: ')
         self.aparelho = input('Aparelho: ')
         self.marca_modelo = input('Marca e modelo: ')
-        self.senha = input('Senha do aparelho: ')
+        self.senha_aparelho = input('Senha do aparelho: ')
         self.defeito = input('Defeito relatado: ')
         self.observacoes = input('Observações: ')
         print()
