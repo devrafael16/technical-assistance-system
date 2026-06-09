@@ -3,13 +3,29 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from ordem_servico import OS
-from database import salvar_cliente, listar_clientes, salvar_os, listar_os
+from database import salvar_cliente, listar_clientes, salvar_os, listar_os, buscar_os_numero, buscar_os_nome
+
+def mostrar_os_banco(ordem):
+    print(f'-' * 40)
+    print(f'\nID: {ordem[0]}')
+    print(f'Número da OS: {ordem[1]}')
+    print(f'Cliente: {ordem[2]}')
+    print(f'Aparelho: {ordem[3]}')
+    print(f'Marca/Modelo: {ordem[4]}')
+    print(f'Senha do aparelho: {ordem[5]}')
+    print(f'Defeito: {ordem[6]}')
+    print(f'Status: {ordem[7]}')
+    print(f'Valor: {ordem[8]}')
+    print(f'Observações: {ordem[9]}')
+    print(f'Data de entrada: {ordem[10]}')
+    print('-' * 40)
 
 
 ordens_servico = []
 
 def main():
-
+# Menu principal do sistema de assistência técnica, com cadastro de clientes e ordens de serviços.
+#Listagem dos clientes e das OS, e alterações.
 
     print(f'{"Sistema de assistência técnica":^30}')
 
@@ -78,53 +94,57 @@ def main():
                     print(f'{"ORDENS DE SERVIÇOS":=^30}')
 
                     for i, os in enumerate(os_banco, start=1):
-                        print(f'{i} | {os[1]} | {os[2]}')
-                    os_escolhida = input('Digite o numero da OS que deseja vizualizar: ')
+                        print(f'\n{i} | {os[1]} | {os[2]}')
+                    os_escolhida = input('\nDigite o numero da OS que deseja visualizar: ')
+                    
                     if os_escolhida.isdigit():
                         os_escolhida = f'OS{int(os_escolhida):03d}'
+                    else:
+                        os_escolhida = os_escolhida.upper()
+
+                    encontrou = False
+
                     for ordem in os_banco:
                         if os_escolhida == ordem[1]:
-                            print(f'\nNumero da OS: {ordem[1]}')
-                            print(f'Cliente: {ordem[2]}')
-                            print(f'Tipo do aparelho: {ordem[3]}')
-                            print(f'Marca/modelo: {ordem[4]}')
-                            print(f'Data de entrada: {ordem[10]}')
-                            print(f'Defeito: {ordem[6]}')
-                            print(f'Observações: {ordem[9]}')
-                            print(f'Status: {ordem[7]}')
-                            print('-' * 30)
+                            mostrar_os_banco(ordem)
+                            encontrou = True
                             break
+                    if not encontrou:
+                        print('OS não encontrada')
 
             elif opcao == 5:
                 print('1 - Buscar por cliente')
                 print('2 - Buscar por número da OS')
+
                 busca = input()
+
                 if busca.isdigit():
                     busca = int(busca)
+
                     if busca == 1:
-                        nome_os = input('Digite o nome: ')
-                        encontrou = False
-                        for ordem_servico in ordens_servico:
-                            if nome_os.lower() in ordem_servico.cliente.lower():
-                                ordem_servico.mostrar_os()
-                                encontrou = True
-                                
-                        if not encontrou:
-                            print('OS não encontrada.')
-                                
+                        nome_os = input('Digite o nome do cliente: ') 
+                        ordens = buscar_os_nome(nome_os)
+
+                        if ordens:
+                            for ordem in ordens:
+                                mostrar_os_banco(ordem)    
+                        else:
+                            print('OS não encontrada')
+                    
                     elif busca == 2:
                         numero = input('Digite o número: ')
+
                         if numero.isdigit():
                             numero = f'OS{int(numero):03d}'
-                        encontrou = False
-                        for ordem_servico in ordens_servico:
-                            if numero == ordem_servico.numero_os:
-                                ordem_servico.mostrar_os()
-                                encontrou = True
-                                
-                        if not encontrou:
-                            print('OS não encontrada.')
-                            
+                        else:
+                            numero = numero.upper()
+
+                        ordem = buscar_os_numero(numero)
+
+                        if ordem:
+                            mostrar_os_banco(ordem)
+                        else:
+                            print('OS não encontrada.')       
 
                     else:
                         print('[red]Opção inválida![/] Digite uma opção válida.')

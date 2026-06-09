@@ -106,6 +106,39 @@ def listar_os():
     return ordens
 
 
+def buscar_os_numero(numero_os):
+
+    conexao = sqlite3.connect("assistencia.db")
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        SELECT * FROM ordens_servico
+        WHERE numero_os = ?
+    """, (numero_os,))
+
+    os_encontrada = cursor.fetchone()
+    conexao.close()
+
+    return os_encontrada
+
+
+def buscar_os_nome(nome_cliente):
+
+    conexao = sqlite3.connect("assistencia.db")
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        SELECT * FROM ordens_servico
+        WHERE cliente LIKE ?
+    """, (f"%{nome_cliente}%",))
+
+    ordens = cursor.fetchall()
+    conexao.close()
+
+    return ordens
+
+
+
 if __name__ == '__main__':
 
     criar_tabelas()
