@@ -89,7 +89,23 @@ def salvar_os(
     """, (numero_os, cliente, aparelho, marca_modelo, senha_aparelho, defeito, status, valor, observacoes, data_entrada))
 
     conexao.commit()
+    id_gerado = cursor.lastrowid
+
+    numero_os = f"OS{id_gerado:03d}"
+
+    # atualiza a própria OS com número correto
+    cursor.execute("""
+        UPDATE ordens_servico
+        SET numero_os = ?
+        WHERE id = ?
+        """, (numero_os, id_gerado))
+    
+    conexao.commit()
     conexao.close()
+
+    return numero_os
+
+    
 
 
 def listar_os():
@@ -136,6 +152,40 @@ def buscar_os_nome(nome_cliente):
     conexao.close()
 
     return ordens
+
+
+def editar_os(numero_os, atributo, novo_valor):
+
+    conexao = sqlite3.connect("assistencia.db")
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+    UPDATE ordens_servico
+    SET {atributo}} = ?
+    WHERE numero_os = ?
+    """, (novo_valor,  numero_os))
+
+    conexao.commit()
+    conexao.close()
+
+
+def deletar_os(numero_os):
+
+    conexao = sqlite3.connect("assistencia.db")
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        DELETE FROM ordens_servico
+        WHERE numero_os = ?
+        """, (numero_os))
+    
+    conexao.commit()
+    conexao.close()
+
+    
+
+
+
 
 
 

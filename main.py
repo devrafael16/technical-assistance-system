@@ -3,7 +3,7 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from ordem_servico import OS
-from database import salvar_cliente, listar_clientes, salvar_os, listar_os, buscar_os_numero, buscar_os_nome
+from database import salvar_cliente, listar_clientes, salvar_os, listar_os, buscar_os_numero, buscar_os_nome, editar_os, deletar_os
 
 def mostrar_os_banco(ordem):
     print(f'-' * 40)
@@ -37,6 +37,7 @@ def main():
         print('4 - Listar Ordem de Serviço')
         print('5 - Buscar Ordem de Serviço')
         print('6 - Editar Ordem de Serviço')
+        print('7 - Excluir Ordem de Serviço')
         print('0 - Sair')
 
         opcao = input('\nDigite a opção desejada: ')
@@ -68,11 +69,10 @@ def main():
                         print('-' * 30)
 
             elif opcao == 3:
-                numero_os = len(ordens_servico) + 1
-                ordem_servico = OS(numero_os)
+                ordem_servico = OS()
                 ordem_servico.abrir_os()
-                ordens_servico.append(ordem_servico)
-                salvar_os(
+                
+                numero_os = salvar_os(
                     ordem_servico.numero_os,
                     ordem_servico.cliente,
                     ordem_servico.aparelho,
@@ -84,7 +84,10 @@ def main():
                     ordem_servico.observacoes,
                     ordem_servico.data_entrada
                 )
+
                 print('[green]Ordem de serviço cadastrada com sucesso![/]')
+                print(f'Número: {numero_os}')
+
 
             elif opcao == 4:
                 os_banco = listar_os()
@@ -160,36 +163,64 @@ def main():
                 numero = input('\n Digite o número da OS que deseja editar: ')
                 if numero.isdigit():
                     numero = f'OS{int(numero):03d}'
-                    encontrou = False
-                    for ordem_servico in ordens_servico:
-                        if numero == ordem_servico.numero_os:
-                            encontrou = True
-                            ordem_servico.mostrar_os()
-                            editar_opcoes = {
-                                '1' : 'cliente',
-                                '2' : 'aparelho',
-                                '3' : 'marca_modelo',
-                                '4' : 'senha_aparelho',
-                                '5' : 'defeito',
-                                '6' : 'status',
-                                '7' : 'valor',
-                                '8' : 'observacoes'
-                            }
-                            print('Qual dado gostaria de alterar: ')
-                            print()
-                            for c,v in editar_opcoes.items():
-                                print(f'{c} - {v}')
-                            opcao = input('')
-                            
-                            if opcao in editar_opcoes:
-                                atributo = editar_opcoes[opcao]
-                                novo_dado = input(f'Novo {atributo}')
-                                if atributo == 'valor':
-                                    novo_dado = float(novo_dado)
-                                ordem_servico.editar_os(atributo, novo_dado)
-                                print('Status atualizado com sucesso!')
-                    if not encontrou:
-                        print('OS não encontrada!')
+                    ordem = buscar_os_numero(numero)
+                    
+                    if ordem:
+                        mostrar_os_banco(ordem)
+                        editar_opcoes = {
+                            '1' : 'cliente',
+                            '2' : 'aparelho',
+                            '3' : 'marca_modelo',
+                            '4' : 'senha_aparelho',
+                            '5' : 'defeito',
+                            '6' : 'status',
+                            '7' : 'valor',
+                            '8' : 'observacoes'
+                        }
+                        print('Qual dado gostaria de alterar: ')
+                        print()
+                        for c,v in editar_opcoes.items():
+                            print(f'{c} - {v}')
+                        opcao = input('')
+                        
+                        if opcao in editar_opcoes:
+                            atributo = editar_opcoes[opcao]
+                            novo_dado = input(f'Novo {atributo}')
+                            if atributo == 'valor':
+                                novo_dado = float(novo_dado)
+                            editar_os(numero, atributo, novo_dado)
+                            print('OS atualizada com sucesso!')
+                    else:
+                        print('OS não encontrada.')
+
+            elif opcao == 7:
+                print(f'{" EXCLUIR ORDEM DE SERVIÇO ":=^30}')
+                numero = input('Digite o número da OS que deseja excluir: ')
+                if numero.isdigit():
+                    numero = f'OS{int(numero):03d}'
+                else:
+                    numero = numero.upper()
+
+                ordem = buscar_os_numero(numero)
+
+                if ordem:
+                    mostrar_os_banco(ordem)
+
+                    confirmacao = input('Deseja excluir essa OS? (s/n): ').lower().strip()
+
+                    if confirmacao == 's':
+                        deletar_os(numero)
+                        print('OS deletada com sucesso!')
+                    elif confirmacao == 'n':
+                        print('Operação cancelada.')
+                    else:
+                        print('Comando inválido!')
+                        continue
+
+                else:
+                    print('Resposta inválida. Digite s ou n.')
+
+
 
 
 
