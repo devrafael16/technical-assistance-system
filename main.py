@@ -3,23 +3,14 @@ from rich import print
 from rich.panel import Panel
 from rich.console import Console
 from ordem_servico import OS
-from database import salvar_cliente, listar_clientes, salvar_os, listar_os, buscar_os_numero, buscar_os_nome, editar_os, deletar_os
+from database import criar_tabelas, salvar_cliente, listar_clientes, salvar_os, listar_os, buscar_os_numero, buscar_os_nome, editar_os, deletar_os
 
-def mostrar_os_banco(ordem):
-    print(f'-' * 40)
-    print(f'\nID: {ordem[0]}')
-    print(f'Número da OS: {ordem[1]}')
-    print(f'Cliente: {ordem[2]}')
-    print(f'Aparelho: {ordem[3]}')
-    print(f'Marca/Modelo: {ordem[4]}')
-    print(f'Senha do aparelho: {ordem[5]}')
-    print(f'Defeito: {ordem[6]}')
-    print(f'Status: {ordem[7]}')
-    print(f'Valor: {ordem[8]}')
-    print(f'Observações: {ordem[9]}')
-    print(f'Data de entrada: {ordem[10]}')
-    print('-' * 40)
 
+
+def formatar_numero_os(entrada: str) -> str:
+    if entrada.isdigit():
+        return f'OS{int(entrada):03d}'
+    return entrada.upper()
 
 ordens_servico = []
 
@@ -61,7 +52,7 @@ def main():
                 if not clientes_banco:
                     print('Nenhum cliente cadastrado.')
                 else:
-                    print(f'\n{"CLIENTES CADASTRADOS":=^30}')
+                    print(f'\n{" CLIENTES CADASTRADOS ":=^30}')
                     for cliente in clientes_banco:
                         print(f'\n{"Nome:":<12} {cliente[1]}')
                         print(f'{"CPF:":<12} {cliente[2]}')
@@ -85,6 +76,8 @@ def main():
                     ordem_servico.data_entrada
                 )
 
+                ordem_servico.numero_os = numero_os
+
                 print('[green]Ordem de serviço cadastrada com sucesso![/]')
                 print(f'Número: {numero_os}')
 
@@ -99,17 +92,13 @@ def main():
                     for i, os in enumerate(os_banco, start=1):
                         print(f'\n{i} | {os[1]} | {os[2]}')
                     os_escolhida = input('\nDigite o numero da OS que deseja visualizar: ')
-                    
-                    if os_escolhida.isdigit():
-                        os_escolhida = f'OS{int(os_escolhida):03d}'
-                    else:
-                        os_escolhida = os_escolhida.upper()
+                    os_escolhida = formatar_numero_os(os_escolhida)
 
                     encontrou = False
 
                     for ordem in os_banco:
                         if os_escolhida == ordem[1]:
-                            mostrar_os_banco(ordem)
+                            OS.mostrar_os_banco(ordem)
                             encontrou = True
                             break
                     if not encontrou:
@@ -130,22 +119,19 @@ def main():
 
                         if ordens:
                             for ordem in ordens:
-                                mostrar_os_banco(ordem)    
+                                OS.mostrar_os_banco(ordem)    
                         else:
                             print('OS não encontrada')
                     
                     elif busca == 2:
                         numero = input('Digite o número: ')
 
-                        if numero.isdigit():
-                            numero = f'OS{int(numero):03d}'
-                        else:
-                            numero = numero.upper()
+                        numero = formatar_numero_os(numero)
 
                         ordem = buscar_os_numero(numero)
 
                         if ordem:
-                            mostrar_os_banco(ordem)
+                            OS.mostrar_os_banco(ordem)
                         else:
                             print('OS não encontrada.')       
 
@@ -161,50 +147,46 @@ def main():
             elif opcao == 6:
                 print(f'{" EDITAR ORDEM DE SERVIÇO ":=^30}')
                 numero = input('\n Digite o número da OS que deseja editar: ')
-                if numero.isdigit():
-                    numero = f'OS{int(numero):03d}'
-                    ordem = buscar_os_numero(numero)
+                numero = formatar_numero_os(numero)
+                ordem = buscar_os_numero(numero)
                     
-                    if ordem:
-                        mostrar_os_banco(ordem)
-                        editar_opcoes = {
-                            '1' : 'cliente',
-                            '2' : 'aparelho',
-                            '3' : 'marca_modelo',
-                            '4' : 'senha_aparelho',
-                            '5' : 'defeito',
-                            '6' : 'status',
-                            '7' : 'valor',
-                            '8' : 'observacoes'
-                        }
-                        print('Qual dado gostaria de alterar: ')
-                        print()
-                        for c,v in editar_opcoes.items():
-                            print(f'{c} - {v}')
-                        opcao = input('')
-                        
-                        if opcao in editar_opcoes:
-                            atributo = editar_opcoes[opcao]
-                            novo_dado = input(f'Novo {atributo}')
-                            if atributo == 'valor':
-                                novo_dado = float(novo_dado)
-                            editar_os(numero, atributo, novo_dado)
-                            print('OS atualizada com sucesso!')
-                    else:
-                        print('OS não encontrada.')
+                if ordem:
+                    OS.mostrar_os_banco(ordem)
+                    editar_opcoes = {
+                        '1' : 'cliente',
+                        '2' : 'aparelho',
+                        '3' : 'marca_modelo',
+                        '4' : 'senha_aparelho',
+                        '5' : 'defeito',
+                        '6' : 'status',
+                        '7' : 'valor',
+                        '8' : 'observacoes'
+                    }
+                    print('Qual dado gostaria de alterar: ')
+                    print()
+                    for c,v in editar_opcoes.items():
+                        print(f'{c} - {v}')
+                    opcao = input('')
+                    
+                    if opcao in editar_opcoes:
+                        atributo = editar_opcoes[opcao]
+                        novo_dado = input(f'Novo {atributo}: ')
+                        if atributo == 'valor':
+                            novo_dado = float(novo_dado)
+                        editar_os(numero, atributo, novo_dado)
+                        print('OS atualizada com sucesso!')
+                else:
+                    print('OS não encontrada.')
 
             elif opcao == 7:
                 print(f'{" EXCLUIR ORDEM DE SERVIÇO ":=^30}')
                 numero = input('Digite o número da OS que deseja excluir: ')
-                if numero.isdigit():
-                    numero = f'OS{int(numero):03d}'
-                else:
-                    numero = numero.upper()
+                numero = formatar_numero_os(numero)
 
                 ordem = buscar_os_numero(numero)
 
                 if ordem:
-                    mostrar_os_banco(ordem)
+                    OS.mostrar_os_banco(ordem)
 
                     confirmacao = input('Deseja excluir essa OS? (s/n): ').lower().strip()
 
@@ -214,15 +196,11 @@ def main():
                     elif confirmacao == 'n':
                         print('Operação cancelada.')
                     else:
-                        print('Comando inválido!')
+                        print('Comando inválido! Digite s ou n.')
                         continue
 
                 else:
-                    print('Resposta inválida. Digite s ou n.')
-
-
-
-
+                    print('OS não encontrada.')
 
 
             elif opcao == 0:
@@ -235,8 +213,10 @@ def main():
 
         else:
             print('[red]Opção inválida![/] Escolha uma das opções do menu.')
-        
+
+    print('Até logo!')    
 
 if __name__ == '__main__':
+    criar_tabelas()
     main()
 

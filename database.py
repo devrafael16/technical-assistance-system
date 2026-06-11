@@ -51,20 +51,12 @@ def salvar_cliente(nome, cpf, telefone, endereco) -> None:
     conexao.commit()
     conexao.close()
 
-def listar_clientes() -> list[Any]:
+def listar_clientes() -> list:
 
-    conexao: sqlite3.Connection = sqlite3.connect('assistencia.db')
-    cursor: sqlite3.Cursor = conexao.cursor()
-
-    cursor.execute("""
-    SELECT * FROM clientes
-    """)
-
-    clientes: list[Any] = cursor.fetchall()
-
-    conexao.close()
-
-    return clientes
+    with sqlite3.connect('assistencia.db') as conexao:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM clientes")
+        return cursor.fetchall()
 
 def salvar_os(
         numero_os,
@@ -156,17 +148,31 @@ def buscar_os_nome(nome_cliente):
 
 def editar_os(numero_os, atributo, novo_valor):
 
-    conexao = sqlite3.connect("assistencia.db")
-    cursor = conexao.cursor()
+    campos_permitidos = [
+        'cliente',
+        'aparelho',
+        'marca_modelo',
+        'senha_aparelho',
+        'defeito',
+        'status',
+        'valor',
+        'observacoes'
+    ]
 
-    cursor.execute("""
-    UPDATE ordens_servico
-    SET {atributo}} = ?
-    WHERE numero_os = ?
-    """, (novo_valor,  numero_os))
+    if atributo not in campos_permitidos:
+        raise ValueError('Campo inválido')
 
-    conexao.commit()
-    conexao.close()
+    with sqlite3.connect('assistencia.db') as conexao:
+        cursor = conexao.cursor()
+
+        cursor.execute(f"""
+        UPDATE ordens_servico
+        SET {atributo} = ?
+        WHERE numero_os = ?
+        """, (novo_valor,  numero_os))
+
+        conexao.commit()
+        
 
 
 def deletar_os(numero_os):
@@ -177,12 +183,12 @@ def deletar_os(numero_os):
     cursor.execute("""
         DELETE FROM ordens_servico
         WHERE numero_os = ?
-        """, (numero_os))
+        """, (numero_os,))
     
     conexao.commit()
     conexao.close()
 
-    
+
 
 
 

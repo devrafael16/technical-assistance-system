@@ -1,8 +1,8 @@
 from datetime import datetime
 
 class OS:
-    def __init__(self, numero_os):  
-        self.numero_os = f'OS{numero_os:03d}'
+    def __init__(self):  
+        self.numero_os = ''
         self.cliente = ''
         self.aparelho = ''
         self.marca_modelo = ''
@@ -33,6 +33,18 @@ class OS:
         print(f'Status: {self.status}')
         print('-' * 30)
 
-    def editar_os(self, atributo, novo_dado):
-        setattr(self, atributo, novo_dado)
-        
+    @staticmethod
+    def mostrar_os_banco(ordem):
+        print(f'-' * 40)
+        print(f'\nID: {ordem[0]}')
+        print(f'Número da OS: {ordem[1]}')
+        print(f'Cliente: {ordem[2]}')
+        print(f'Aparelho: {ordem[3]}')
+        print(f'Marca/Modelo: {ordem[4]}')
+        print(f'Senha do aparelho: {ordem[5]}')
+        print(f'Defeito: {ordem[6]}')
+        print(f'Status: {ordem[7]}')
+        print(f'Valor: {ordem[8]}')
+        print(f'Observações: {ordem[9]}')
+        print(f'Data de entrada: {ordem[10]}')
+        print('-' * 40)
